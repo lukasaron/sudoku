@@ -70,7 +70,12 @@ func (b *Board) IsValid() bool {
 		return false
 	}
 
-	//TODO isValid - rows, boxes, rows
+	for i := 0; i < 9; i++ { // hardcoded value
+		if !b.isValidBox(i) || !b.isValidRow(i) || !b.isValidColumn(i) {
+			return false
+		}
+	}
+
 	return true
 }
 
@@ -106,5 +111,6 @@ func (b Board) isValidColumn(column int) bool {
 }
 
 func (b Board) isValidBox(box int) bool {
+
 	return true
 }
