@@ -100,7 +100,16 @@ func (b Board) Error() error {
 }
 
 func (b Board) GetValue(row, column int) int {
-	panic("implement me")
+	if b.e != nil {
+		return -1
+	}
+
+	if b.outOfBoard(row, column) {
+		b.e = errOutOfBoardIndex
+		return -1
+	}
+
+	return b.b[row][column]
 }
 
 func (b Board) GetRow(row int) []int {
