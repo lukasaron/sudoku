@@ -1,10 +1,12 @@
 package sudoku
 
-import "errors"
+import (
+	"errors"
+)
 
 const (
-	rows    = 9
-	columns = 9
+	size    = 9
+	boxSize = 3
 )
 
 var (
@@ -13,41 +15,55 @@ var (
 )
 
 type Board struct {
-	b [rows][columns]int
+	b [][]int
 	e error
+	s bool
 }
 
 type Game interface {
-	SetClue(row, column, value int)
+	SetClue(row, column, value int) Game
+	GetValue(row, column int) int
+	GetRow(row int) []int
+	GetColumn(column int) []int
+	GetBoard() [][]int
 	IsEmpty(row, column int) bool
 	IsValid() bool
+	Solve()
+	Error() error
 }
 
 func NewBoard() Game {
+	board := make([][]int, size, size)
+	for i := 0; i < size; i++ {
+		board[i] = make([]int, size, size)
+	}
+
 	return &Board{
-		b: [rows][columns]int{},
+		b: board, // board
+		s: false, // solved
 	}
 }
 
-func (b *Board) SetClue(row, column, value int) {
+func (b *Board) SetClue(row, column, value int) Game {
 	// do nothing when any error occurred
 	if b.e != nil {
-		return
+		return b
 	}
 
 	// check for board index value
 	if b.outOfBoard(row, column) {
 		b.e = errOutOfBoardIndex
-		return
+		return b
 	}
 
 	// check for value
 	if value < 1 || value > 9 {
 		b.e = errOutOfBoundValue
-		return
+		return b
 	}
 
 	b.b[row][column] = value
+	return b
 }
 
 func (b *Board) IsEmpty(row, column int) bool {
@@ -70,7 +86,7 @@ func (b *Board) IsValid() bool {
 		return false
 	}
 
-	for i := 0; i < 9; i++ { // hardcoded value
+	for i := 0; i < size; i++ {
 		if !b.isValidBox(i) || !b.isValidRow(i) || !b.isValidColumn(i) {
 			return false
 		}
@@ -79,14 +95,72 @@ func (b *Board) IsValid() bool {
 	return true
 }
 
+func (b Board) Error() error {
+	return b.e
+}
+
+func (b Board) GetValue(row, column int) int {
+	panic("implement me")
+}
+
+func (b Board) GetRow(row int) []int {
+	if b.e != nil {
+		return nil
+	}
+
+	if b.outOfBoard(row, 0) {
+		b.e = errOutOfBoardIndex
+		return nil
+	}
+
+	r := make([]int, size, size)
+	copy(r, b.b[row])
+	return r
+}
+
+func (b Board) GetColumn(column int) []int {
+	if b.e != nil {
+		return nil
+	}
+
+	if b.outOfBoard(0, column) {
+		b.e = errOutOfBoardIndex
+		return nil
+	}
+
+	c := make([]int, size, size)
+	for i := 0; i < size; i++ {
+		c[i] = b.b[i][column]
+	}
+
+	return c
+}
+
+func (b Board) GetBoard() [][]int {
+	board := make([][]int, size, size)
+	for i := 0; i < size; i++ {
+		copy(board[i], b.b[i])
+	}
+
+	return board
+}
+
+func (b Board) Solve() {
+	if b.e != nil {
+		return
+	}
+
+	panic("implement me")
+}
+
 // ------------------------------------------------- PRIVATE METHODS -------------------------------------------------
 
 func (b Board) outOfBoard(row, column int) bool {
-	return row < 0 || row > (rows-1) || column < 0 || column > (columns-1)
+	return row < 0 || row > (size-1) || column < 0 || column > (size-1)
 }
 
 func (b Board) isValidRow(row int) bool {
-	m := [rows + 1]int{}
+	m := [size + 1]int{}
 	for _, value := range b.b[row] {
 		if m[value] > 0 {
 			return false
@@ -98,8 +172,8 @@ func (b Board) isValidRow(row int) bool {
 }
 
 func (b Board) isValidColumn(column int) bool {
-	m := [columns + 1]int{}
-	for row := 0; row < rows; row++ {
+	m := [size + 1]int{}
+	for row := 0; row < size; row++ {
 		value := b.b[row][column]
 		if m[value] > 0 {
 			return false
@@ -111,6 +185,34 @@ func (b Board) isValidColumn(column int) bool {
 }
 
 func (b Board) isValidBox(box int) bool {
+	if box < 0 || box > 8 {
+		return false
+	}
+
+	m := [size + 1]int{}
+	row := (box / boxSize) * boxSize
+	column := (box % boxSize) * boxSize
+
+	for r := row; r < row+boxSize; r++ {
+		for c := column; c < column+boxSize; c++ {
+			if m[b.b[r][c]] > 0 {
+				return false
+			}
+			m[b.b[r][c]] = b.b[r][c]
+		}
+	}
 
 	return true
+}
+
+func (b Board) getNextEmptyIndex() (int, int) {
+	for r := 0; r < size; r++ {
+		for c := 0; c < size; c++ {
+			if b.b[r][c] == 0 {
+				return r, c
+			}
+		}
+	}
+
+	return -1, -1
 }
