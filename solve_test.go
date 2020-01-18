@@ -1,19 +1,18 @@
 package sudoku
 
 import (
-	"fmt"
 	"testing"
 )
 
 func TestBoard_IsValid(t *testing.T) {
-	g := game()
+	g := easyGame()
 	if !g.IsValid() {
 		t.Error("basic sudoku should be valid")
 	}
 }
 
 func TestBoard_IsValidRow(t *testing.T) {
-	g := game()
+	g := easyGame()
 	if !g.IsValid() {
 		t.Error("basic sudoku should be valid")
 	}
@@ -25,9 +24,9 @@ func TestBoard_IsValidRow(t *testing.T) {
 }
 
 func TestBoard_IsValidColumn(t *testing.T) {
-	g := game()
+	g := easyGame()
 	if !g.IsValid() {
-		t.Error("basic game should be valid")
+		t.Error("basic easyGame should be valid")
 	}
 
 	g.SetClue(4, 6, 2)
@@ -37,7 +36,7 @@ func TestBoard_IsValidColumn(t *testing.T) {
 }
 
 func TestBoard_IsValidBox(t *testing.T) {
-	g := game()
+	g := easyGame()
 	if !g.IsValid() {
 		t.Error("basic sudoku should be valid")
 	}
@@ -49,18 +48,17 @@ func TestBoard_IsValidBox(t *testing.T) {
 }
 
 func TestBoard_Solve(t *testing.T) {
-	g := game2()
+	g := hardGame()
 	g.Solve()
 	err := g.Error()
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Printf("%+v\n", g.Board())
 }
 
 // ------------------------------------------------------ DATA ------------------------------------------------------
 
-func game() Game {
+func easyGame() Game {
 	return NewBoard().
 		// first row - 0
 		SetClue(0, 0, 4).
@@ -106,6 +104,35 @@ func game() Game {
 		SetClue(8, 4, 1).
 		SetClue(8, 6, 2).
 		SetClue(8, 8, 7)
+}
+
+func hardGame() Game {
+	return NewBoard().
+		SetClue(0, 0, 8).
+		SetClue(0, 2, 1).
+		SetClue(0, 7, 4).
+		SetClue(0, 8, 5).
+		SetClue(1, 6, 7).
+		SetClue(1, 8, 6).
+		SetClue(2, 1, 5).
+		SetClue(2, 2, 6).
+		SetClue(2, 6, 8).
+		SetClue(3, 1, 9).
+		SetClue(3, 3, 7).
+		SetClue(3, 6, 1).
+		SetClue(4, 4, 8).
+		SetClue(5, 3, 2).
+		SetClue(5, 6, 5).
+		SetClue(5, 7, 3).
+		SetClue(5, 8, 8).
+		SetClue(6, 4, 4).
+		SetClue(6, 7, 8).
+		SetClue(7, 0, 4).
+		SetClue(7, 1, 2).
+		SetClue(7, 2, 7).
+		SetClue(7, 7, 1).
+		SetClue(8, 4, 9).
+		SetClue(8, 8, 4)
 }
 
 func game2() Game {

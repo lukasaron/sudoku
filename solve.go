@@ -30,6 +30,7 @@ type Game interface {
 	Value(row, column int) int
 	Row(row int) []int
 	Column(column int) []int
+	Box(boxIndex int) [][]int
 	Board() [][]int
 	IsEmpty(row, column int) bool
 	IsValid() bool
@@ -155,6 +156,24 @@ func (b Board) Board() [][]int {
 	return board
 }
 
+func (b *Board) Box(boxIndex int) [][]int {
+	if boxIndex < 0 || boxIndex > boardSide {
+		b.e = errOutOfBoardIndex
+		return nil
+	}
+
+	box := make([][]int, boardBoxSize, boardBoxSize)
+	bs := b.box(boxIndex)
+	for i := 0; i < boardBoxSize; i++ {
+		box[i] = make([]int, boardBoxSize, boardBoxSize)
+		for j := 0; j < boardBoxSize; j++ {
+			box[i][j] = bs[i*boardBoxSize+j]
+		}
+	}
+
+	return box
+}
+
 func (b Board) Solve() {
 	if b.e != nil || b.s {
 		return
@@ -164,12 +183,15 @@ func (b Board) Solve() {
 
 func (b Board) String() string {
 	sb := strings.Builder{}
-	for r := 0; r < boardSide; r++ {
-		for c := 0; c < boardSide; c++ {
-			sb.WriteString(fmt.Sprintf("|%d", b.b[r*boardSide+c]))
+
+	for idx, i := 0, 1; idx < boardSize; i, idx = i+1, idx+1 {
+		sb.WriteString(fmt.Sprintf("|%d", b.b[idx]))
+		if i == boardSide {
+			sb.WriteString("|\n")
+			i = 0
 		}
-		sb.WriteString("|\n")
 	}
+
 	return sb.String()
 }
 
@@ -203,9 +225,9 @@ func (b Board) column(idx int) []int {
 	return c
 }
 
-func (b Board) box(boxNumber int) []int {
-	row := (boxNumber / boardBoxSize) * boardBoxSize
-	column := (boxNumber % boardBoxSize) * boardBoxSize
+func (b Board) box(boxIndex int) []int {
+	row := (boxIndex / boardBoxSize) * boardBoxSize
+	column := (boxIndex % boardBoxSize) * boardBoxSize
 
 	box := make([]int, boardBoxSize*boardBoxSize, boardBoxSize*boardBoxSize)
 	i := 0
@@ -235,22 +257,13 @@ func (b Board) isValidBox(boxNumber int) bool {
 	return b.isValidSlice(box)
 }
 
-func (b Board) emptyValueIndex(idx, offset int) int {
-	// fmt.Println(idx, offset)
-	// out of bounds - not found
-	if idx-offset < 0 || idx+offset >= len(b.b) {
-		return -1
+func (b Board) emptyValueIndex() int {
+	for i := 0; i < len(b.b); i++ {
+		if b.b[i] == 0 {
+			return i
+		}
 	}
-
-	if b.b[idx-offset] == 0 {
-		return idx - offset
-	}
-
-	if b.b[idx+offset] == 0 {
-		return idx + offset
-	}
-
-	return b.emptyValueIndex(idx, offset+1)
+	return -1
 }
 
 func (b *Board) solve() {
@@ -259,7 +272,7 @@ func (b *Board) solve() {
 		return
 	}
 
-	idx := b.emptyValueIndex(boardSize/2, 0)
+	idx := b.emptyValueIndex()
 	if idx < 0 {
 		b.s = true
 		return
