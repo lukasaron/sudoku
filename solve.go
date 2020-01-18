@@ -22,10 +22,10 @@ type Board struct {
 
 type Game interface {
 	SetClue(row, column, value int) Game
-	GetValue(row, column int) int
-	GetRow(row int) []int
-	GetColumn(column int) []int
-	GetBoard() [][]int
+	Value(row, column int) int
+	Row(row int) []int
+	Column(column int) []int
+	Board() [][]int
 	IsEmpty(row, column int) bool
 	IsValid() bool
 	Solve()
@@ -99,7 +99,7 @@ func (b Board) Error() error {
 	return b.e
 }
 
-func (b Board) GetValue(row, column int) int {
+func (b Board) Value(row, column int) int {
 	if b.e != nil {
 		return -1
 	}
@@ -112,7 +112,7 @@ func (b Board) GetValue(row, column int) int {
 	return b.b[row][column]
 }
 
-func (b Board) GetRow(row int) []int {
+func (b Board) Row(row int) []int {
 	if b.e != nil {
 		return nil
 	}
@@ -127,7 +127,7 @@ func (b Board) GetRow(row int) []int {
 	return r
 }
 
-func (b Board) GetColumn(column int) []int {
+func (b Board) Column(column int) []int {
 	if b.e != nil {
 		return nil
 	}
@@ -145,9 +145,10 @@ func (b Board) GetColumn(column int) []int {
 	return c
 }
 
-func (b Board) GetBoard() [][]int {
+func (b Board) Board() [][]int {
 	board := make([][]int, size, size)
 	for i := 0; i < size; i++ {
+		board[i] = make([]int, size, size)
 		copy(board[i], b.b[i])
 	}
 
@@ -155,11 +156,10 @@ func (b Board) GetBoard() [][]int {
 }
 
 func (b Board) Solve() {
-	if b.e != nil {
+	if b.e != nil || b.s {
 		return
 	}
-
-	panic("implement me")
+	b.solve()
 }
 
 // ------------------------------------------------- PRIVATE METHODS -------------------------------------------------
@@ -215,13 +215,71 @@ func (b Board) isValidBox(box int) bool {
 }
 
 func (b Board) getNextEmptyIndex() (int, int) {
-	for r := 0; r < size; r++ {
-		for c := 0; c < size; c++ {
-			if b.b[r][c] == 0 {
-				return r, c
-			}
-		}
+	//n := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(size * size)
+	rowSeed := size / 2
+	columnSeed := size / 2
+
+	row, column := b.getNextEmpty(rowSeed, columnSeed)
+	if row < 0 || column < 0 {
+		row, column = b.getPreviousEmpty(rowSeed, columnSeed)
+	}
+
+	return row, column
+}
+
+func (b Board) getPreviousEmpty(row, column int) (int, int) {
+	if b.b[row][column] == 0 {
+		return row, column
+	}
+
+	if column > 0 {
+		return b.getPreviousEmpty(row, column-1)
+	}
+
+	if row > 0 {
+		return b.getPreviousEmpty(row-1, size-1)
 	}
 
 	return -1, -1
+}
+
+func (b Board) getNextEmpty(row, column int) (int, int) {
+	if b.b[row][column] == 0 {
+		return row, column
+	}
+
+	if column < size-1 {
+		return b.getNextEmpty(row, column+1)
+	}
+
+	if row < size-1 {
+		return b.getNextEmpty(row+1, column)
+	}
+
+	return -1, -1
+}
+
+func (b *Board) solve() {
+	// no need to check for error
+	if b.s {
+		return
+	}
+
+	r, c := b.getNextEmptyIndex()
+	if c < 0 || r < 0 {
+		b.s = true
+		return
+	}
+
+	for !b.s {
+		b.b[r][c] += 1
+		if b.b[r][c] > 9 {
+			b.b[r][c] = 0
+			return
+		}
+
+		if b.IsValid() {
+			b.solve()
+		}
+	}
 }

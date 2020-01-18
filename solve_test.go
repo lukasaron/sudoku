@@ -1,6 +1,9 @@
 package sudoku
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestBoard_IsValid(t *testing.T) {
 	g := game()
@@ -43,6 +46,16 @@ func TestBoard_IsValidBox(t *testing.T) {
 	if g.IsValid() {
 		t.Error("there is a duplicated value in the box 8, value 6")
 	}
+}
+
+func TestBoard_Solve(t *testing.T) {
+	g := game2()
+	g.Solve()
+	err := g.Error()
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Printf("%+v\n", g.Board())
 }
 
 // ------------------------------------------------------ DATA ------------------------------------------------------
@@ -93,4 +106,25 @@ func game() Game {
 		SetClue(8, 4, 1).
 		SetClue(8, 6, 2).
 		SetClue(8, 8, 7)
+}
+
+func game2() Game {
+	return NewBoard().
+		SetClue(1, 5, 3).
+		SetClue(1, 7, 8).
+		SetClue(1, 8, 5).
+		SetClue(2, 2, 1).
+		SetClue(2, 4, 2).
+		SetClue(3, 3, 5).
+		SetClue(3, 5, 7).
+		SetClue(4, 2, 4).
+		SetClue(4, 6, 1).
+		SetClue(5, 1, 9).
+		SetClue(6, 0, 5).
+		SetClue(6, 7, 7).
+		SetClue(6, 8, 3).
+		SetClue(7, 2, 2).
+		SetClue(7, 4, 1).
+		SetClue(8, 4, 4).
+		SetClue(8, 8, 9)
 }
