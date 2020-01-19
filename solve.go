@@ -7,16 +7,16 @@ import (
 )
 
 const (
-	boardSize     = 81
-	boardSide     = 9
-	boardHalfSize = 4
-	boardBoxSize  = 3
-	maxValue      = 9
+	boardSize    = 81
+	boardSide    = 9
+	boardBoxSize = 3
+	maxValue     = 9
 )
 
 var (
-	errOutOfBoardIndex = errors.New("index is out of board")
-	errOutOfBoundValue = errors.New("value is out of bounds, has to be between 1 - 9")
+	errOutOfBoardIndex   = errors.New("index is out of board")
+	errOutOfBoundValue   = errors.New("value is out of bounds")
+	errWrongValuesLength = errors.New("wrong length of values")
 )
 
 type Board struct {
@@ -26,7 +26,11 @@ type Board struct {
 }
 
 type Game interface {
-	SetClue(row, column, value int) Game
+	SetValue(row, column, value int) Game
+	SetRow(row int, values []int) Game
+	SetColumn(column int, values []int) Game
+	SetBox(boxIndex int, values []int) Game
+	SetBoard(values [][]int)
 	Value(row, column int) int
 	Row(row int) []int
 	Column(column int) []int
@@ -47,7 +51,7 @@ func NewBoard() Game {
 	}
 }
 
-func (b *Board) SetClue(row, column, value int) Game {
+func (b *Board) SetValue(row, column, value int) Game {
 	// do nothing when any error occurred
 	if b.e != nil {
 		return b
@@ -60,13 +64,69 @@ func (b *Board) SetClue(row, column, value int) Game {
 	}
 
 	// check for value
-	if value < 1 || value > maxValue {
+	if value < 0 || value > maxValue {
 		b.e = errOutOfBoundValue
 		return b
 	}
 
 	b.b[idx] = value
 	return b
+}
+
+func (b *Board) SetRow(row int, values []int) Game {
+	if b.e != nil {
+		return b
+	}
+
+	if len(values) != boardSide {
+		b.e = errWrongValuesLength
+		return b
+	}
+
+	idx := b.index(row, 0)
+	for _, v := range values {
+		if v < 0 || v > maxValue {
+			b.e = errOutOfBoundValue
+			return b
+		}
+		b.b[idx] = v
+		idx++
+	}
+
+	return b
+}
+
+func (b *Board) SetColumn(column int, values []int) Game {
+	if b.e != nil {
+		return b
+	}
+
+	if len(values) != boardSide {
+		b.e = errWrongValuesLength
+		return b
+	}
+	row := 0
+	for _, v := range values {
+		if v < 0 || v > maxValue {
+			b.e = errOutOfBoundValue
+			return b
+		}
+		idx := b.index(row, column)
+		b.b[idx] = v
+		row++
+	}
+
+	return b
+}
+
+func (b *Board) SetBox(boxIndex int, values []int) Game {
+	// TODO implement
+	panic("implement me")
+}
+
+func (b *Board) SetBoard(values [][]int) {
+	// TODO implement
+	panic("implement me")
 }
 
 func (b *Board) IsEmpty(row, column int) bool {
@@ -258,7 +318,8 @@ func (b Board) isValidBox(boxNumber int) bool {
 }
 
 func (b Board) emptyValueIndex() int {
-	for i := 0; i < len(b.b); i++ {
+	// start searching from the end
+	for i := len(b.b) - 1; i >= 0; i-- {
 		if b.b[i] == 0 {
 			return i
 		}
