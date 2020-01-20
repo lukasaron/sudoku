@@ -15,6 +15,11 @@ entirely whole board at once.
 Sudoku can be solved by calling the method `Solve` on created Sudoku instance. Moreover, the whole sudoku can be
 printed in any state, because implements the `Stringer` interface
 
+Installation:
+```go 
+go get github.com/lukasaron/sudoku
+```
+
 Example of basic usage:
 ```go
 package main
