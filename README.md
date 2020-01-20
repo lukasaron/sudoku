@@ -1,5 +1,5 @@
 # Sudoku 
-
+[![GoDoc](https://godoc.org/github.com/lukasaron/sudoku?status.svg)](https://godoc.org/github.com/lukasaron/sudoku)
 [![Build Status](https://travis-ci.com/lukasaron/sudoku.svg?branch=master)](https://travis-ci.com/lukasaron/sudoku)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lukasaron/sudoku)](https://goreportcard.com/report/github.com/lukasaron/sudoku)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
