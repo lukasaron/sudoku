@@ -6,11 +6,12 @@ import (
 	"strings"
 )
 
+// Numerical constants related to the board, such as number of cells, number of cells on one side or maximal cell value.
 const (
-	BoardSize    = 81
-	BoardSide    = 9
-	BoardBoxSize = 3
-	MaxValue     = 9
+	BoardSize    = 81 // Size of the board, the number of cells
+	BoardSide    = 9  // Size of one side of the board
+	BoardBoxSize = 3  // Size of one side of the box within the board
+	MaxValue     = 9  // maximal value that one cell can keep
 )
 
 // Errors that could occur during user communication with the Game.
@@ -426,7 +427,7 @@ func (b *Board) solve() {
 	}
 
 	for !b.s {
-		b.b[idx] += 1
+		b.b[idx]++
 		if b.b[idx] > 9 {
 			b.b[idx] = 0 // empty value
 			return
