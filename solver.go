@@ -314,7 +314,7 @@ func (b *Board) Box(boxIndex int) []int {
 	return b.box(boxIndex)
 }
 
-// Solve methods solve the Sudoku based on the set values. When there is a state error this method has no behavior.
+// Solve method solves the Sudoku based on the set values. When there is a state error this method has no behavior.
 func (b Board) Solve() {
 	// do nothing when any error occurred
 	if b.e != nil {

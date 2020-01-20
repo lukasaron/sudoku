@@ -1,6 +1,7 @@
 # Sudoku 
 
 [![Build Status](https://travis-ci.com/lukasaron/sudoku.svg?branch=master)](https://travis-ci.com/lukasaron/sudoku)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lukasaron/sudoku)](https://goreportcard.com/report/github.com/lukasaron/sudoku)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 Package sudoku contains the solver for the well known and ubiquitous Sudoku game.
@@ -16,62 +17,33 @@ printed in any state, because implements the `Stringer` interface
 
 Example of basic usage:
 ```go
-		package main
+package main
 
-		import (
-			"fmt"
-			"github.com/lukasaron/sudoku"
-			"log"
-		)
+import (
+    "fmt"
+    "github.com/lukasaron/sudoku"
+    "log"
+)
 
-		func main() {
-			game := sudoku.NewBoard().SetBoard([][]int{
-				{0, 0, 0, 0, 0, 0, 1, 4, 8},
-				{0, 1, 0, 0, 2, 6, 0, 0, 3},
-				{0, 0, 0, 0, 1, 0, 6, 0, 0},
-				{0, 0, 0, 0, 0, 0, 9, 0, 2},
-				{1, 0, 0, 3, 6, 2, 0, 0, 7},
-				{5, 0, 7, 0, 0, 0, 0, 0, 0},
-				{0, 0, 5, 0, 3, 0, 0, 0, 0},
-				{3, 0, 0, 1, 9, 0, 0, 7, 0},
-				{4, 7, 0, 0, 0, 0, 0, 0, 0},
-			})
+func main() {
+    game := sudoku.NewBoard().SetBoard([][]int{
+        {0, 0, 0, 0, 0, 0, 1, 4, 8},
+        {0, 1, 0, 0, 2, 6, 0, 0, 3},
+        {0, 0, 0, 0, 1, 0, 6, 0, 0},
+        {0, 0, 0, 0, 0, 0, 9, 0, 2},
+        {1, 0, 0, 3, 6, 2, 0, 0, 7},
+        {5, 0, 7, 0, 0, 0, 0, 0, 0},
+        {0, 0, 5, 0, 3, 0, 0, 0, 0},
+        {3, 0, 0, 1, 9, 0, 0, 7, 0},
+        {4, 7, 0, 0, 0, 0, 0, 0, 0},
+    })
 
-			err := game.Error()
-			if err != nil {
-				log.Fatal(err)
-			}
+    err := game.Error()
+    if err != nil {
+        log.Fatal(err)
+    }
 
-			game.Solve()
-			fmt.Println(game)
-		}
-		package main
-
-		import (
-			"fmt"
-			"github.com/lukasaron/sudoku"
-			"log"
-		)
-
-		func main() {
-			game := sudoku.NewBoard().SetBoard([][]int{
-				{0, 0, 0, 0, 0, 0, 1, 4, 8},
-				{0, 1, 0, 0, 2, 6, 0, 0, 3},
-				{0, 0, 0, 0, 1, 0, 6, 0, 0},
-				{0, 0, 0, 0, 0, 0, 9, 0, 2},
-				{1, 0, 0, 3, 6, 2, 0, 0, 7},
-				{5, 0, 7, 0, 0, 0, 0, 0, 0},
-				{0, 0, 5, 0, 3, 0, 0, 0, 0},
-				{3, 0, 0, 1, 9, 0, 0, 7, 0},
-				{4, 7, 0, 0, 0, 0, 0, 0, 0},
-			})
-
-			err := game.Error()
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			game.Solve()
-			fmt.Println(game)
-		}
+    game.Solve()
+    fmt.Println(game)
+}
 ```
